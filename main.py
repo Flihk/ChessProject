@@ -85,7 +85,7 @@ class Piece(object):
         if inList(self.PossibleMoves(), [col, row]):
             self.col = col
             self.row = row
-            if(main.board[col][row] != "_"):
+            if(main.board[row][col] != "_"):
                 if(self.color == "White"):
                     for i in main.blackList:
                         if(i.col == self.col and i.row == self.row):
@@ -101,9 +101,9 @@ class Piece(object):
 
     def Captured(self):
         if (self.color == "White"):
-            main.whiteList.pop(whiteList.index(self))
+            main.whiteList.remove(self)
         else:
-            main.blackList.pop(blackList.index(self))
+            main.blackList.remove(self)
 
 
 # king class
@@ -206,21 +206,62 @@ class Rook(Piece):
         while (self.col - self.whileVar >= 0 and main.board[self.row][self.col - self.whileVar] == "_"):
             self.returnList.append([self.col - self.whileVar, self.row])
             self.whileVar += 1
+        if (self.col - self.whileVar >= 0):
+            if (main.board[self.row][self.col - self.whileVar] != "_"):
+                if (self.color == "White"):
+                    for i in main.blackList:
+                        if (i.row == self.row and i.col == self.col - self.whileVar):
+                            self.returnList.append([self.col - self.whileVar, self.row])
+                else:
+                    for i in main.whiteList:
+                        if (i.row == self.row and i.col == self.col - self.whileVar):
+                            self.returnList.append([self.col - self.whileVar, self.row])
+
         # going right
         self.whileVar = 1
         while (self.col + self.whileVar <= 7 and main.board[self.row][self.col + self.whileVar] == "_"):
             self.returnList.append([self.col + self.whileVar, self.row])
             self.whileVar += 1
+        if (self.col + self.whileVar <= 7):
+            if (main.board[self.row][self.col + self.whileVar] != "_"):
+                if (self.color == "White"):
+                    for i in main.blackList:
+                        if (i.row == self.row and i.col == self.col + self.whileVar):
+                            self.returnList.append([self.col + self.whileVar, self.row])
+                else:
+                    for i in main.whiteList:
+                        if (i.row == self.row and i.col == self.col + self.whileVar):
+                            self.returnList.append([self.col + self.whileVar, self.row])
         # going up
         self.whileVar = 1
         while (self.row - self.whileVar >= 0 and main.board[self.row - self.whileVar][self.col] == "_"):
             self.returnList.append([self.col, self.row - self.whileVar])
             self.whileVar += 1
+        if (self.row - self.whileVar >= 0):
+            if (main.board[self.row - self.whileVar][self.col] != "_"):
+                if (self.color == "White"):
+                    for i in main.blackList:
+                        if (i.row == self.row - self.whileVar and i.col == self.col):
+                            self.returnList.append([self.col, self.row - self.whileVar])
+                else:
+                    for i in main.whiteList:
+                        if (i.row == self.row - self.whileVar and i.col == self.col):
+                            self.returnList.append([self.col, self.row - self.whileVar])
         # going down
         self.whileVar = 1
         while (self.row + self.whileVar <= 7 and main.board[self.row + self.whileVar][self.col] == "_"):
             self.returnList.append([self.col, self.row + self.whileVar])
             self.whileVar += 1
+        if (self.row + self.whileVar <= 7):
+            if (main.board[self.row + self.whileVar][self.col] != "_"):
+                if (self.color == "White"):
+                    for i in main.blackList:
+                        if (i.row == self.row + self.whileVar and i.col == self.col):
+                            self.returnList.append([self.col, self.row + self.whileVar])
+                else:
+                    for i in main.whiteList:
+                        if (i.row == self.row + self.whileVar and i.col == self.col):
+                            self.returnList.append([self.col, self.row + self.whileVar])
         return self.returnList
 
 
@@ -416,18 +457,13 @@ main = Board()
 main.query()
 
 print()
-print(main.whiteList[3].PossibleMoves())
 
-main.whiteList[3].Move(3,5)
-main.whiteList[10].Move(5,4)
-
-print(main.whiteList[10].PossibleMoves())
-
-main.whiteList[10].Move(2,1)
-
-print(main.blackList[2].col, main.blackList[2].row)
-print(main.whiteList[10].col, main.whiteList[10].row)
-
+main.whiteList[0].Move(0,4)
+main.whiteList[8].Move(0,5)
+main.whiteList[8].Move(1,5)
+print(main.whiteList[8].PossibleMoves())
+main.whiteList[8].Move(1,1)
+main.whiteList[8].Move(1,5)
 
 
 pygame.init()
