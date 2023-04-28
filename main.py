@@ -72,21 +72,45 @@ class Piece(object):
 
     def Move(self, col, row):
         if inList(self.PossibleMoves(), [col, row]):
+            self.col2 = self.col
+            self.row2 = self.row
             self.col = col
             self.row = row
-            if(main.board[row][col] != "_"):
-                if(self.color == "White"):
-                    for i in main.blackList:
-                        if(i.col == self.col and i.row == self.row):
-                            i.Captured()
-                else:
-                    for i in main.whiteList:
-                        if (i.col == self.col and i.row == self.row):
-                            i.Captured()
+            main.update()
+            if (self.color == "White"):
+                for i in main.whiteList:
+                    if i.notate == "K":
+                        if(i.isInCheck()):
+                            self.col = self.col2
+                            self.row = self.row2
+                            print("Invalid Move")
+                            return False
+                        else:
+                            if (main.board[row][col] != "_"):
+                                for k in main.blackList:
+                                    if (k.col == self.col and k.row == self.row):
+                                        k.Captured()
+                            main.query()
+                            return True
+            else:
+                for i in main.blackList:
+                    if i.notate == "k":
+                        if(i.isInCheck()):
+                            self.col = self.col2
+                            self.row = self.row2
+                            print("Invalid Move")
+                            return False
+                        else:
+                            if (main.board[row][col] != "_"):
+                                for k in main.whiteList:
+                                    if (k.col == self.col and k.row == self.row):
+                                        k.Captured()
+                            main.query()
+                            return True
 
-            main.query()
         else:
             print("Invalid Move")
+            return False
 
     def Captured(self):
         if (self.color == "White"):
@@ -103,10 +127,11 @@ class King(Piece):
             self.notate = "K"
         else:
             self.notate = "k"
+        self.inCheck = False
 
     def PossibleMoves(self):
         self.returnList = [[self.col-1, self.row-1], [self.col-0, self.row-1], [self.col+1, self.row-1],
-                           [self.col-1, self.row-0],                       [self.col+1, self.row-0],
+                           [self.col-1, self.row-0],                           [self.col+1, self.row-0],
                            [self.col-1, self.row+1], [self.col-0, self.row+1], [self.col+1, self.row+1]]
         # removing invalid diagonal moves
         if (self.col == 0 or self.row == 0):
@@ -127,6 +152,23 @@ class King(Piece):
         if (self.row == 7):
             self.returnList.remove([self.col-0, self.row+1])
         return self.returnList
+
+    def isInCheck(self):
+        if (self.color == "White"):
+            for i in main.blackList:
+                for k in i.PossibleMoves():
+                    if (k[0] == self.col and k[1] == self.row):
+                        self.inCheck = True
+                        return True
+        else:
+            for i in main.whiteList:
+                for k in i.PossibleMoves():
+                    if (k[0] == self.col and k[1] == self.row):
+                        self.inCheck = True
+                        return True
+        self.inCheck = False
+        return False
+
 
 
 # queen class
@@ -512,6 +554,8 @@ class Pawn(Piece):
 
     def Move(self, col, row):
         if inList(self.PossibleMoves(), [col, row]):
+            self.col2 = self.col
+            self.row2 = self.row
             self.col = col
             self.row = row
             if (main.board[row][col] != "_"):
@@ -523,8 +567,35 @@ class Pawn(Piece):
                     for i in main.whiteList:
                         if (i.col == self.col and i.row == self.row):
                             i.Captured()
-            self.hasMoved = True
-            main.query()
+            main.update()
+            if (self.color == "White"):
+                for i in main.whiteList:
+                    if i.notate == "K":
+                        if (i.isInCheck()):
+                            self.col = self.col2
+                            self.row = self.row2
+                            print("Invalid Move")
+                        else:
+                            if (main.board[row][col] != "_"):
+                                for k in main.blackList:
+                                    if (k.col == self.col and k.row == self.row):
+                                        k.Captured()
+                            self.hasMoved = True
+                            main.query()
+            else:
+                for i in main.blackList:
+                    if i.notate == "k":
+                        if (i.isInCheck()):
+                            self.col = self.col2
+                            self.row = self.row2
+                            print("Invalid Move")
+                        else:
+                            if (main.board[row][col] != "_"):
+                                for k in main.whiteList:
+                                    if (k.col == self.col and k.row == self.row):
+                                        k.Captured()
+                            self.hasMoved = True
+                            main.query()
         else:
             print("Invalid Move")
 
@@ -542,9 +613,12 @@ def move(fromX, fromY, toX, toY):
     for i in main.whiteList:
         if (i.col == fromX and i.row == fromY):
             i.Move(toX, toY)
+            return True
     for i in main.blackList:
         if (i.col == fromX and i.row == fromY):
             i.Move(toX, toY)
+            return True
+    return False
 
 
 main = Board()
@@ -552,11 +626,6 @@ main = Board()
 main.query()
 
 print()
-
-move(4,1,4,2)
-move(3,0,6,3)
-move(6,3,6,6)
-move(6,6,5,7)
 
 pygame.init()
 # cool test comment 2
